@@ -20,7 +20,7 @@ urlpatterns = [
     path('notes/<int:pk>/delete/', views.deleteNote, name="delete-note"),
     path('users/<int:pk>/notes',views.getUserNotes, name="my-notes"),
     path('notes/<int:pk>/share/', views.share, name="share-note"),
-    path('search/',views.searchNote, name='note-search'),
+    path('search',views.searchNote, name='note-search'),
     # path('notes/create/', views.createNote, name="create-note"),
 
 ]

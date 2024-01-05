@@ -14,6 +14,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity, SearchVector
 from django.db.models import Q
 from django_ratelimit.decorators import ratelimit
+from django.db.models import F
+import json
 
 
 ###
@@ -142,18 +144,34 @@ def share(request, pk):
         serializer = NoteSerializer(note, context={'request': request})
         return Response(serializer.data)    
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+from django.http import JsonResponse
+from django.core.serializers import serialize
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@ratelimit(key='ip', rate='100/h')
 def searchNote(request):
-        query = request.GET.get('q')
-        if query:
-            vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
-            search_query = SearchQuery(query)
-            notes = Note.objects.annotate(
-                rank=SearchRank(vector, search_query)
-            ).filter(rank__gte=0.3).order_by('-rank')  # Adjust rank threshold as needed
-            notes = notes.filter(Q(owner=request.user) | Q(shared_users=request.user))  # Restrict to accessible notes
-            serializer = NoteSerializer(notes, many=True, context={'request': request})
-            return Response(serializer.data)
-        return Response({'error': 'Please provide a query parameter.'}, status=400)
+    try:
+        query = request.GET.get('q', '')
+        
+        if not query:
+            return JsonResponse({'error': 'Please provide a query parameter.'}, status=400)
+
+        title_matches = Note.objects.filter(title__icontains=query)
+        body_matches = Note.objects.filter(body__icontains=query)
+
+        notes = title_matches.union(body_matches)
+        if len(notes) == 0:
+            return Response({"message":"Search Not Found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = serialize('json', notes)
+        parsed_data = json.loads(data)  # Convert to Python object
+
+        return JsonResponse(parsed_data, safe=False)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
