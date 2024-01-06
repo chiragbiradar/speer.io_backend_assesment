@@ -35,26 +35,26 @@ To enhance search performance, text indexing is implemented. This feature enable
 
 ### Note Endpoints
 
-- GET /api/notes: Get a list of all notes for the authenticated user.
-- GET /api/notes/:id: Get a note by ID for the authenticated user.
-- POST /api/notes: Create a new note for the authenticated user.
-- PUT /api/notes/:id: Update an existing note by ID for the authenticated user.
-- DELETE /api/notes/:id: Delete a note by ID for the authenticated user.
-- POST /api/notes/:id/share: Share a note with another user for the authenticated user.
+## Authentication endpoints:
+- POST /api/auth/signup: create a new user account.
+- POST /api/auth/login :g in to an existing user account and receive an access token
+## Notes Endpoints
+- GET /api/notes/: Get a list of all notes for the authenticated user.
+- GET /api/notes/create/ : Create a new note for the authenticated user.
+- POST /api/notes/<int:pk>/: Get a note by ID for the authenticated user.
+- PUT /api/notes/<int:pk>/update/ : Update an existing note by ID for the authenticated user.
+- DELETE /api/notes/<int:pk>/delete/ : Delete a note by ID for the authenticated user.
+- POST /api/notes/<int:pk>/share: Share a note with another user for the authenticated user using user id.
 - GET /api/search?q=:query: Search for notes based on keywords for the authenticated user.
 
-## Deliverables
-
-- GitHub Repository: [Link to Repository]
-- README File: Provides details on the chosen framework, database, third-party tools, and instructions on running the code and tests.
-- Setup Files/Scripts: Includes any necessary files or scripts to run the code locally or in a test environment.
+## additional endpoints for user profile
+api/profile/
+api/profile/update/
 
 ## How to Run the Code and Tests
 
-1. Clone the repository: git clone [repository_url]
+1. Clone the repository: git clone https://github.com/chiragbiradar/speer.io_backend_assesment.git
 2. Install dependencies: pip install -r requirements.txt
 3. Apply migrations: python manage.py migrate
 4. Run the development server: python manage.py runserver
-5. Execute tests: python manage.py test
-
-For additional configurations or settings, refer to the README file in the repository.
+5. Execute tests: cd NotesApp python manage.py test
