@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'django.contrib.postgres',
-    # 'ratelimit',
     ]
 
 MIDDLEWARE = [
@@ -114,15 +113,7 @@ WSGI_APPLICATION = 'NotesApi.wsgi.application'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    # 'DEFAULT_THROTTLE_CLASSES': [
-    #     'rest_framework.throttling.AnonRateThrottle',
-    #     'rest_framework.throttling.UserRateThrottle'
-    # ],
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '100/hour',  # 100 requests per hour for unauthenticated users
-    #     'user': '1000/hour',  # 1000 requests per hour for authenticated users
-    # }
+    )
 }
 
 AUTH_USER_MODEL = 'NotesApp.CustomUser'
@@ -135,8 +126,12 @@ AUTH_USER_MODEL = 'NotesApp.CustomUser'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'azdedvkq',  # Database name
+        'USER': 'azdedvkq',  # Database user
+        'PASSWORD': 'imrVMWWis8E63JDHLPts55TGKvU8EAEn',  # Database password
+        'HOST': 'kiouni.db.elephantsql.com',  # Database server
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
 

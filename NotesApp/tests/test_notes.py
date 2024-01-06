@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from .models import CustomUser, Note
+from ..models import CustomUser, Note
 
 # You'll likely need to import your models, serializers, and views
 
@@ -10,16 +10,8 @@ class NotesViewSetTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         # Create a test user and note (consider using fixtures for setup)
-        self.user = CustomUser.objects.create_user(
-            username='testuser',
-            email='testuser@example.com',
-            password='password123'
-        )
-        self.note = Note.objects.create(
-            user=self.user,
-            title='Test Note',
-            body='This is a test note for testing purposes.'
-        )
+        self.user = CustomUser.objects.create_user(...)
+        self.note = Note.objects.create(...)
 
     def test_get_notes(self):
         self.client.force_authenticate(user=self.user)

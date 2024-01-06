@@ -1,22 +1,16 @@
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, generics
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .serializers import MyTokenObtainPairSerializer, RegisterSerializer
+from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, NoteSerializer, ProfileSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
 from .models import Note, CustomUser
-from .serializers import NoteSerializer, ProfileSerializer
 from django.shortcuts import get_object_or_404
-from django.contrib.postgres.search import SearchQuery, SearchRank, TrigramSimilarity, SearchVector
-from django.db.models import Q
+from django.db.models import Q, F
 from django_ratelimit.decorators import ratelimit
-from django.db.models import F
 import json
-
+from django.core.serializers import serialize
 
 ###
 #Login User
@@ -50,26 +44,32 @@ def getRoutes(request):
     ]
     return Response(routes)
 
-@api_view(['GET','POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @ratelimit(key='ip', rate='100/h')
 def getNotes(request):
-    if request.method == 'GET':
-        user_notes = request.user.notes.all().order_by('-updated')[:10]
-        shared_notes = Note.objects.filter(shared_users=request.user)  
-        notes = user_notes | shared_notes
-        serializer = NoteSerializer(notes, many=True, context={'request': request})
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        user = request.user
-        data = request.data
-        note = Note.objects.create(
-            user=user,
-            title=data['title'],
-            body=data['body'],
-        )
-        serializer = NoteSerializer(note, many=False, context={'request': request})
-        return Response(serializer.data)
+    user_notes = request.user.notes.all().order_by('-updated')[:10]
+    shared_notes = Note.objects.filter(shared_users=request.user)  
+    notes = user_notes | shared_notes
+    serializer = NoteSerializer(notes, many=True, context={'request': request})
+    return Response(serializer.data)
+
+    
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+@ratelimit(key='ip', rate='100/h')
+def createNote(request):
+    user = request.user
+    data = request.data
+    note = Note.objects.create(
+        user=user,
+        title=data['title'],
+        body=data['body'],
+    )
+    serializer = NoteSerializer(note, many=False, context={'request': request})
+    return Response(serializer.data)
+    
 
 #api/notes/<int:pk>
 @api_view(['GET'])
@@ -144,12 +144,6 @@ def share(request, pk):
         serializer = NoteSerializer(note, context={'request': request})
         return Response(serializer.data)    
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-from django.http import JsonResponse
-from django.core.serializers import serialize
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
