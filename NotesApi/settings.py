@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -127,10 +128,10 @@ AUTH_USER_MODEL = 'NotesApp.CustomUser'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'azdedvkq',  # Database name
-        'USER': 'azdedvkq',  # Database user
-        'PASSWORD': 'imrVMWWis8E63JDHLPts55TGKvU8EAEn',  # Database password
-        'HOST': 'kiouni.db.elephantsql.com',  # Database server
+        'NAME': os.getenv('DatabaseName'),  # Database name
+        'USER': os.getenv('DatabaseUser'),  # Database user
+        'PASSWORD': os.getenv('DBpassword'),  # Database password
+        'HOST': os.getenv('DBserver'),  # Database server
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
